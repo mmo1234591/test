@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學生帳密查詢系統 - 首頁</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.05) rotate(2deg); }
+            70% { transform: scale(0.9) rotate(-1deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 165, 0, 0.6); }
+        }
+        
+        @keyframes slide-up {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .bounce-in {
+            animation: bounce-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .slide-up {
+            animation: slide-up 0.6s ease-out forwards;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f7d794 0%, #f3a683 25%, #f8c291 50%, #f7d794 75%, #f3a683 100%);
+            background-size: 400% 400%;
+            animation: gradient-shift 8s ease infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-icon:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full gradient-bg">
+  <div class="min-h-full"><!-- 主要內容區域 -->
+   <div class="container mx-auto px-4 py-12"><!-- 標題區域 -->
+    <div class="text-center mb-16">
+     <div class="floating mb-8">
+      <div class="text-8xl mb-6">
+       🎓
+      </div>
+     </div>
+     <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 bounce-in">學生帳密查詢系統</h1>
+     <p class="text-xl md:text-2xl text-white/90 mb-8 slide-up" style="animation-delay: 0.2s;">安全、便捷、智能的學生帳號密碼管理平台</p>
+     <div class="slide-up" style="animation-delay: 0.4s;"><button onclick="enterSystem()" class="bg-white text-orange-600 px-12 py-4 rounded-2xl text-xl font-bold hover:bg-orange-50 transform hover:scale-105 transition-all duration-300 shadow-2xl pulse-glow"> 🚀 立即進入系統 </button>
+     </div>
+    </div><!-- 功能特色區域 -->
+    <div class="max-w-6xl mx-auto mb-16">
+     <h2 class="text-3xl font-bold text-white text-center mb-12 slide-up" style="animation-delay: 0.6s;">✨ 系統特色功能</h2>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"><!-- 功能卡片 1 -->
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center card-hover slide-up" style="animation-delay: 0.8s;">
+       <div class="text-5xl mb-4 feature-icon">
+        🔍
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-3">快速查詢</h3>
+       <p class="text-gray-600">學生點擊專屬卡片即可快速查看個人帳號密碼資訊</p>
+      </div><!-- 功能卡片 2 -->
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center card-hover slide-up" style="animation-delay: 1.0s;">
+       <div class="text-5xl mb-4 feature-icon">
+        ⚙️
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-3">管理便捷</h3>
+       <p class="text-gray-600">支援單筆和批量新增學生資料，管理操作簡單高效</p>
+      </div><!-- 功能卡片 3 -->
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center card-hover slide-up" style="animation-delay: 1.2s;">
+       <div class="text-5xl mb-4 feature-icon">
+        💾
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-3">自動儲存</h3>
+       <p class="text-gray-600">資料自動儲存到 Canva Sheet，永不遺失，隨時同步</p>
+      </div><!-- 功能卡片 4 -->
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center card-hover slide-up" style="animation-delay: 1.4s;">
+       <div class="text-5xl mb-4 feature-icon">
+        🔒
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-3">安全可靠</h3>
+       <p class="text-gray-600">採用安全的資料儲存機制，保護學生隱私資訊</p>
+      </div>
+     </div>
+    </div><!-- 使用說明區域 -->
+    <div class="max-w-4xl mx-auto mb-16">
+     <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 slide-up" style="animation-delay: 1.6s;">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">📋 使用說明</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8"><!-- 學生使用說明 -->
+       <div class="text-center">
+        <div class="text-4xl mb-4">
+         👨‍🎓
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">學生使用方式</h3>
+        <div class="text-left space-y-2 text-gray-600">
+         <p>1️⃣ 進入系統後找到自己的座號卡片</p>
+         <p>2️⃣ 點擊卡片查看個人帳號密碼</p>
+         <p>3️⃣ 複製帳密資訊用於登入系統</p>
+        </div>
+       </div><!-- 管理員使用說明 -->
+       <div class="text-center">
+        <div class="text-4xl mb-4">
+         👨‍💼
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">管理員使用方式</h3>
+        <div class="text-left space-y-2 text-gray-600">
+         <p>1️⃣ 點擊「管理員設定」開啟管理面板</p>
+         <p>2️⃣ 選擇單筆或批量輸入模式</p>
+         <p>3️⃣ 填寫學生資料並自動儲存</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- 底部行動呼籲 -->
+    <div class="text-center slide-up" style="animation-delay: 1.8s;">
+     <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">🎯 準備好開始使用了嗎？</h2>
+      <p class="text-gray-600 mb-6">立即進入系統，體驗便捷的學生帳密管理功能</p><button onclick="enterSystem()" class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-10 py-4 rounded-xl text-lg font-bold hover:from-orange-500 hover:to-red-500 transform hover:scale-105 transition-all duration-300 shadow-lg"> 🚀 開始使用系統 </button>
+     </div>
+    </div>
+   </div><!-- 裝飾性浮動元素 -->
+   <div class="fixed top-20 left-10 text-4xl opacity-20 floating" style="animation-delay: 0s;">
+    📚
+   </div>
+   <div class="fixed top-40 right-20 text-3xl opacity-20 floating" style="animation-delay: 1s;">
+    🎓
+   </div>
+   <div class="fixed bottom-40 left-20 text-3xl opacity-20 floating" style="animation-delay: 2s;">
+    💻
+   </div>
+   <div class="fixed bottom-20 right-10 text-4xl opacity-20 floating" style="animation-delay: 3s;">
+    🔐
+   </div>
+  </div>
+  <script>
+        function enterSystem() {
+            // 這裡可以導航到主系統頁面
+            // 由於這是單頁應用，我們可以隱藏首頁並顯示主系統
+            showNotification('正在進入系統...', 'success');
+            
+            // 模擬載入過程
+            setTimeout(() => {
+                // 這裡可以替換為實際的頁面跳轉邏輯
+                // 例如：window.location.href = 'main-system.html';
+                // 或者顯示主系統內容
+                alert('歡迎使用學生帳密查詢系統！\n\n在實際應用中，這裡會跳轉到主系統頁面。');
+            }, 1000);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // 頁面載入動畫
+        document.addEventListener('DOMContentLoaded', function() {
+            // 為所有需要動畫的元素添加 slide-up 類
+            const animatedElements = document.querySelectorAll('.slide-up');
+            animatedElements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(50px)';
+                
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        // 滑鼠移動視差效果
+        document.addEventListener('mousemove', function(e) {
+            const decorativeElements = document.querySelectorAll('.fixed');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            decorativeElements.forEach((element, index) => {
+                const speed = (index + 1) * 0.5;
+                const x = (mouseX - 0.5) * speed;
+                const y = (mouseY - 0.5) * speed;
+                
+                element.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999f3f970493f23c',t:'MTc2MjM3NjA4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
