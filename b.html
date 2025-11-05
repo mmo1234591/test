@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學生帳密查詢系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.05) rotate(2deg); }
+            70% { transform: scale(0.9) rotate(-1deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes particle {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle 2s linear infinite;
+        }
+        
+        .bounce-in {
+            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .wiggle:hover {
+            animation: wiggle 0.5s ease-in-out;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f7d794 0%, #f3a683 50%, #f8c291 100%);
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.3);
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full gradient-bg">
+  <div class="min-h-full py-8 px-4">
+   <div class="max-w-6xl mx-auto"><!-- 標題區域 -->
+    <div class="text-center mb-12">
+     <h1 class="text-4xl font-bold text-white mb-4 wiggle">🎓 學生帳密查詢系統 🔍</h1>
+     <p class="text-lg text-purple-100">點擊你的專屬卡片查看帳號密碼！</p>
+    </div><!-- 管理員設定區域 -->
+    <div class="text-center mb-8"><button type="button" id="toggleAdminBtn" class="bg-gradient-to-r from-orange-300 to-red-300 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-400 hover:to-red-400 transform hover:scale-105 transition-all duration-200 shadow-lg"> ⚙️ 管理員設定 </button>
+    </div>
+    <div id="adminPanel" class="bg-white rounded-2xl shadow-xl p-8 mb-8 bounce-in hidden">
+     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">⚙️ 管理員設定區</h2><!-- 輸入模式切換 -->
+     <div class="flex mb-6 bg-gray-100 rounded-xl p-1"><button type="button" id="singleModeBtn" class="flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-orange-300 to-red-300 text-white"> 📝 單筆輸入 </button> <button type="button" id="batchModeBtn" class="flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-gray-800"> 📋 批量輸入 </button>
+     </div><!-- 單筆輸入模式 -->
+     <div id="singleMode">
+      <form id="studentForm" class="space-y-4">
+       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">座號</label> <input type="text" id="studentId" placeholder="例：01" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none transition-colors">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">姓名</label> <input type="text" id="studentName" placeholder="例：王小明" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none transition-colors">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">帳號</label> <input type="text" id="username" placeholder="例：student123" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none transition-colors">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">密碼</label> <input type="text" id="password" placeholder="例：pass456" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none transition-colors">
+        </div>
+       </div><button type="submit" class="bg-gradient-to-r from-orange-300 to-red-300 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-400 hover:to-red-400 transform hover:scale-105 transition-all duration-200 shadow-lg"> ✨ 新增學生卡片 </button>
+      </form>
+     </div><!-- 批量輸入模式 -->
+     <div id="batchMode" class="hidden">
+      <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">批量輸入學生資料</label>
+       <p class="text-sm text-gray-500 mb-3">每行一個學生，格式：座號 姓名 帳號 密碼（用空格分隔）</p><textarea id="batchInput" rows="8" placeholder="01 王小明 student123 pass456
+02 李小華 student456 pass789
+03 張小美 student789 pass123" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none transition-colors font-mono text-sm"></textarea>
+      </div>
+      <div class="flex gap-4"><button type="button" onclick="processBatchInput()" class="bg-gradient-to-r from-orange-300 to-red-300 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-400 hover:to-red-400 transform hover:scale-105 transition-all duration-200 shadow-lg"> 🚀 批量新增學生 </button> <button type="button" onclick="clearBatchInput()" class="bg-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"> 🗑️ 清空 </button>
+      </div>
+     </div>
+    </div><!-- 學生卡片區域 -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">👥 學生卡片區</h2>
+     <div id="studentCards" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"><!-- 卡片會動態生成在這裡 -->
+     </div>
+     <div id="emptyState" class="text-center py-12 text-gray-500">
+      <div class="text-6xl mb-4">
+       📚
+      </div>
+      <p class="text-lg">還沒有學生資料，請先新增學生卡片！</p>
+     </div>
+    </div>
+   </div>
+  </div><!-- 帳密顯示彈窗 -->
+  <div id="credentialModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+   <div class="bg-white rounded-2xl shadow-2xl p-8 m-4 max-w-md w-full bounce-in">
+    <div class="text-center">
+     <div class="text-4xl mb-4">
+      🎉
+     </div>
+     <h3 class="text-2xl font-bold text-gray-800 mb-2" id="modalStudentName"></h3>
+     <p class="text-gray-600 mb-6" id="modalStudentId"></p>
+     <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 mb-6">
+      <div class="space-y-4">
+       <div class="text-left"><label class="block text-sm font-medium text-gray-700 mb-1">帳號</label>
+        <div class="bg-white px-4 py-3 rounded-lg border-2 border-orange-200 font-mono text-lg" id="modalUsername"></div>
+       </div>
+       <div class="text-left"><label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+        <div class="bg-white px-4 py-3 rounded-lg border-2 border-red-200 font-mono text-lg" id="modalPassword"></div>
+       </div>
+      </div>
+     </div><button onclick="closeModal()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all duration-200"> 關閉 </button>
+    </div>
+   </div>
+  </div>
+  <script>
+        let students = [];
+        let isLoading = false;
+        const colors = [
+            'from-orange-200 to-red-200',
+            'from-yellow-200 to-orange-200', 
+            'from-red-200 to-pink-200',
+            'from-pink-200 to-rose-200',
+            'from-amber-200 to-orange-200',
+            'from-rose-200 to-pink-200'
+        ];
+        
+        const emojis = ['🌟', '🎨', '🚀', '🎯', '💎', '🌈', '⭐', '🎪', '🎭', '🎨'];
+
+        // 資料處理器
+        const dataHandler = {
+            onDataChanged(data) {
+                students = data || [];
+                renderStudentCards();
+            }
+        };
+
+        // 初始化資料SDK
+        async function initializeDataSDK() {
+            try {
+                const result = await window.dataSdk.init(dataHandler);
+                if (!result.isOk) {
+                    console.error('資料SDK初始化失敗');
+                    showNotification('資料系統初始化失敗', 'error');
+                }
+            } catch (error) {
+                console.error('資料SDK初始化錯誤:', error);
+                showNotification('資料系統初始化錯誤', 'error');
+            }
+        }
+
+        // 儲存學生資料
+        async function saveStudent(studentData) {
+            if (isLoading) return false;
+            
+            if (students.length >= 999) {
+                showNotification('已達到最大學生數量限制 (999)，請先刪除一些學生資料', 'error');
+                return false;
+            }
+
+            isLoading = true;
+            showLoadingState(true);
+
+            try {
+                const result = await window.dataSdk.create(studentData);
+                if (result.isOk) {
+                    showNotification('學生資料已儲存到 Canva Sheet！', 'success');
+                    return true;
+                } else {
+                    showNotification('儲存失敗，請重試', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('儲存錯誤:', error);
+                showNotification('儲存時發生錯誤', 'error');
+                return false;
+            } finally {
+                isLoading = false;
+                showLoadingState(false);
+            }
+        }
+
+        // 顯示載入狀態
+        function showLoadingState(loading) {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const batchBtn = document.querySelector('button[onclick="processBatchInput()"]');
+            
+            if (loading) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '⏳ 儲存中...';
+                }
+                if (batchBtn) {
+                    batchBtn.disabled = true;
+                    batchBtn.innerHTML = '⏳ 批量儲存中...';
+                }
+            } else {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '✨ 新增學生卡片';
+                }
+                if (batchBtn) {
+                    batchBtn.disabled = false;
+                    batchBtn.innerHTML = '🚀 批量新增學生';
+                }
+            }
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isLoading) return;
+            
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!studentId || !studentName || !username || !password) {
+                showNotification('請填寫所有欄位！', 'error');
+                return;
+            }
+            
+            // 檢查座號是否重複
+            if (students.some(s => s.studentId === studentId)) {
+                showNotification('座號已存在！', 'error');
+                return;
+            }
+            
+            const student = {
+                studentId,
+                studentName,
+                username,
+                password,
+                color: colors[students.length % colors.length],
+                emoji: emojis[Math.floor(Math.random() * emojis.length)]
+            };
+            
+            const success = await saveStudent(student);
+            if (success) {
+                // 清空表單
+                document.getElementById('studentForm').reset();
+            }
+        });
+
+        function renderStudentCards() {
+            const container = document.getElementById('studentCards');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (students.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = students.map((student, index) => `
+                <div class="bg-gradient-to-br ${student.color} rounded-xl p-3 text-gray-700 card-hover cursor-pointer transform transition-all duration-300 floating relative overflow-hidden" 
+                     onclick="showCredentials('${student.studentId}')" 
+                     onmouseenter="createParticles(this)" 
+                     style="animation-delay: ${index * 0.1}s">
+                    <div class="text-center relative z-10">
+                        <div class="text-2xl mb-2">${student.emoji}</div>
+                        <p class="text-xl font-bold mb-1">${student.studentId}</p>
+                        <h3 class="text-sm font-bold mb-2">${student.studentName}</h3>
+                        <div class="bg-white bg-opacity-30 rounded-lg py-1 px-2">
+                            <p class="text-xs font-medium">點擊查看 🔍</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCredentials(studentId) {
+            const student = students.find(s => s.studentId === studentId);
+            if (!student) return;
+            
+            document.getElementById('modalStudentName').textContent = student.studentName;
+            document.getElementById('modalStudentId').textContent = `座號：${student.studentId}`;
+            document.getElementById('modalUsername').textContent = student.username;
+            document.getElementById('modalPassword').textContent = student.password;
+            
+            const modal = document.getElementById('credentialModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('credentialModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // 點擊彈窗背景關閉
+        document.getElementById('credentialModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 管理員面板切換功能
+        document.getElementById('toggleAdminBtn').addEventListener('click', function() {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel.classList.contains('hidden')) {
+                adminPanel.classList.remove('hidden');
+                this.textContent = '🔒 關閉設定';
+            } else {
+                adminPanel.classList.add('hidden');
+                this.textContent = '⚙️ 管理員設定';
+            }
+        });
+
+        // 模式切換功能
+        document.getElementById('singleModeBtn').addEventListener('click', function() {
+            switchMode('single');
+        });
+        
+        document.getElementById('batchModeBtn').addEventListener('click', function() {
+            switchMode('batch');
+        });
+        
+        function switchMode(mode) {
+            const singleMode = document.getElementById('singleMode');
+            const batchMode = document.getElementById('batchMode');
+            const singleBtn = document.getElementById('singleModeBtn');
+            const batchBtn = document.getElementById('batchModeBtn');
+            
+            if (mode === 'single') {
+                singleMode.classList.remove('hidden');
+                batchMode.classList.add('hidden');
+                singleBtn.className = 'flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-orange-300 to-red-300 text-white';
+                batchBtn.className = 'flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-gray-800';
+            } else {
+                singleMode.classList.add('hidden');
+                batchMode.classList.remove('hidden');
+                batchBtn.className = 'flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-orange-300 to-red-300 text-white';
+                singleBtn.className = 'flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-gray-800';
+            }
+        }
+        
+        // 批量輸入處理
+        async function processBatchInput() {
+            if (isLoading) return;
+            
+            const batchText = document.getElementById('batchInput').value.trim();
+            if (!batchText) {
+                showNotification('請輸入學生資料！', 'error');
+                return;
+            }
+            
+            const lines = batchText.split('\n').filter(line => line.trim());
+            let successCount = 0;
+            let errorCount = 0;
+            const errors = [];
+            
+            // 檢查是否會超過限制
+            if (students.length + lines.length > 999) {
+                showNotification(`批量新增會超過最大限制 (999)，目前已有 ${students.length} 筆資料`, 'error');
+                return;
+            }
+            
+            isLoading = true;
+            showLoadingState(true);
+            
+            for (let index = 0; index < lines.length; index++) {
+                const line = lines[index];
+                const parts = line.split(/\s+/).filter(part => part.trim());
+                
+                if (parts.length !== 4) {
+                    errors.push(`第 ${index + 1} 行格式錯誤`);
+                    errorCount++;
+                    continue;
+                }
+                
+                const [studentId, studentName, username, password] = parts;
+                
+                if (!studentId || !studentName || !username || !password) {
+                    errors.push(`第 ${index + 1} 行有空白欄位`);
+                    errorCount++;
+                    continue;
+                }
+                
+                // 檢查座號是否重複
+                if (students.some(s => s.studentId === studentId)) {
+                    errors.push(`第 ${index + 1} 行座號 ${studentId} 已存在`);
+                    errorCount++;
+                    continue;
+                }
+                
+                const student = {
+                    studentId,
+                    studentName,
+                    username,
+                    password,
+                    color: colors[students.length % colors.length],
+                    emoji: emojis[Math.floor(Math.random() * emojis.length)]
+                };
+                
+                try {
+                    const result = await window.dataSdk.create(student);
+                    if (result.isOk) {
+                        successCount++;
+                    } else {
+                        errors.push(`第 ${index + 1} 行儲存失敗`);
+                        errorCount++;
+                    }
+                } catch (error) {
+                    errors.push(`第 ${index + 1} 行儲存錯誤`);
+                    errorCount++;
+                }
+            }
+            
+            isLoading = false;
+            showLoadingState(false);
+            
+            if (successCount > 0) {
+                showNotification(`成功儲存 ${successCount} 個學生到 Canva Sheet！`, 'success');
+                document.getElementById('batchInput').value = '';
+            }
+            
+            if (errorCount > 0) {
+                setTimeout(() => {
+                    showNotification(`${errorCount} 個錯誤：${errors.slice(0, 3).join('、')}${errors.length > 3 ? '...' : ''}`, 'error');
+                }, 1000);
+            }
+        }
+        
+        function clearBatchInput() {
+            document.getElementById('batchInput').value = '';
+            showNotification('已清空輸入內容', 'success');
+        }
+
+        // 粒子特效函數
+        function createParticles(element) {
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 0.5 + 's';
+                particle.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+                
+                element.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 2500);
+            }
+        }
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.dataSdk) {
+                initializeDataSDK();
+            } else {
+                // 如果SDK未載入，顯示空狀態
+                renderStudentCards();
+            }
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999f40cc460ff23c',t:'MTc2MjM3NjEzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
